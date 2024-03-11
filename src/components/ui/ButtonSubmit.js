@@ -10,8 +10,7 @@ const poppins = Poppins({
     subsets: ["latin"],
 });
 
-export default function ButtonSubmit({ title, className, ...props }) {
-    const { pending } = useFormStatus();
+export default function ButtonSubmit({ title, className, pending, ...props }) {
     return (
         <button
             type="submit"

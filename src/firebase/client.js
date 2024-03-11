@@ -12,3 +12,4 @@ const firebaseApp = initializeApp({
 });
 
 export const auth = getAuth(firebaseApp);
+auth.languageCode = "en";

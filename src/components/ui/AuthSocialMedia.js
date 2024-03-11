@@ -1,7 +1,12 @@
 import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
 import SocialButton from "./SocialButton";
 
-export default function AuthSocialMedia({ googleText, facebookText }) {
+export default function AuthSocialMedia({
+    googleText,
+    googleOnClick,
+    facebookText,
+    facebookOnClick,
+}) {
     return (
         <section>
             <div className="flex items-center gap-4">
@@ -11,12 +16,16 @@ export default function AuthSocialMedia({ googleText, facebookText }) {
             </div>
             <div className="mt-4 flex flex-col gap-4">
                 {googleText && (
-                    <SocialButton text={googleText} href="#" icon={faGoogle} />
+                    <SocialButton
+                        text={googleText}
+                        onClick={googleOnClick}
+                        icon={faGoogle}
+                    />
                 )}
                 {facebookText && (
                     <SocialButton
                         text={facebookText}
-                        href="#"
+                        onClick={facebookOnClick}
                         icon={faFacebook}
                     />
                 )}
