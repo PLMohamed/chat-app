@@ -20,6 +20,10 @@ export default function SideBarItem({ img, title, text }) {
                     width={48}
                     height={48}
                     className="flex-shrink-0 rounded-full"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/accountImagePlaceholder.png";
+                    }}
                 />
                 <div className="ms-3">
                     <p className="text-lg font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400">

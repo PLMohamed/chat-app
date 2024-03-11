@@ -93,7 +93,14 @@ export default function SignupForm() {
 
     return (
         <AuthForm title="Create an account">
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+            <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSubmit}
+                onInput={(e) =>
+                    delete errors[e.target.name] && setErrors({ ...errors })
+                }
+                noValidate
+            >
                 {errors.server && (
                     <Alert type="danger" message={errors.server} id="alert" />
                 )}

@@ -10,7 +10,6 @@ import Alert from "@/components/Alert";
 import { useState } from "react";
 import {
     GoogleAuthProvider,
-    onAuthStateChanged,
     signInWithEmailAndPassword,
     signInWithPopup,
 } from "firebase/auth";
@@ -20,8 +19,10 @@ import { redirect } from "next/navigation";
 
 export default function LoginForm() {
     const [errors, setErrors] = useState({});
-    console.log(auth.currentUser);
+    const [pending, setPending] = useState(false);
+
     async function handleSubmit(e) {
+        setPending(true);
         e.preventDefault();
         const formData = new FormData(e.target);
         const email = formData.get("email");
@@ -36,7 +37,10 @@ export default function LoginForm() {
 
         if (!password) errors.password = "Password is required";
 
-        if (Object.keys(errors).length > 0) return setErrors(errors);
+        if (Object.keys(errors).length > 0) {
+            setPending(false);
+            return setErrors(errors);
+        }
 
         try {
             const userCredential = await signInWithEmailAndPassword(
@@ -51,6 +55,8 @@ export default function LoginForm() {
             const errorMessage = await convertErrorCodeToMessage(error.code);
             console.log(errorMessage, error.code);
             return setErrors({ server: errorMessage });
+        } finally {
+            setPending(false);
         }
         redirect("/");
     }
@@ -76,6 +82,9 @@ export default function LoginForm() {
             <form
                 className="space-y-4 md:space-y-6"
                 onSubmit={handleSubmit}
+                onInput={(e) =>
+                    delete errors[e.target.name] && setErrors({ ...errors })
+                }
                 noValidate
             >
                 {errors?.server && (
@@ -106,7 +115,7 @@ export default function LoginForm() {
                         Forgot password?
                     </Link>
                 </div>
-                <ButtonSubmit title="Sign in" />
+                <ButtonSubmit title="Sign in" pending={pending} />
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                     Don&apos;t have an account yet?{" "}
                     <Link

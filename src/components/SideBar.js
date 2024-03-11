@@ -20,7 +20,7 @@ export default function SideBar() {
             <>
                 <aside
                     id="sidebar"
-                    className="fixed left-0 top-0 z-40 flex h-screen w-64 -translate-x-full flex-col bg-neutral-100 transition-transform sm:translate-x-0 dark:bg-gray-800"
+                    className="fixed left-0 top-0 z-40 mr-64 flex h-screen w-64 -translate-x-full flex-col bg-neutral-100 transition-transform sm:translate-x-0 dark:bg-gray-800"
                 >
                     <div className="flex items-center justify-between bg-primary-600 p-4 text-white dark:bg-primary-600">
                         <span className="text-2xl font-semibold ">Chats</span>
