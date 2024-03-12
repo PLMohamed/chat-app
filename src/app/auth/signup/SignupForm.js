@@ -12,10 +12,12 @@ import {
     GoogleAuthProvider,
     createUserWithEmailAndPassword,
     signInWithPopup,
+    updateProfile,
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { redirect } from "next/navigation";
 import { convertErrorCodeToMessage } from "@/lib/firebase";
+import { storeUserInfo } from "@/utils/users";
 
 export default function SignupForm() {
     const [errors, setErrors] = useState({});
@@ -62,10 +64,13 @@ export default function SignupForm() {
 
             const user = userCredential.user;
             if (!user) throw new Error("User not found");
-
-            await user.updateProfile({
-                displayName: username,
-            });
+            updateProfile(auth.currentUser, { displayName: username });
+            await storeUserInfo(
+                user.uid,
+                email,
+                username,
+                "/accountImagePlaceholder.jpg",
+            );
         } catch (error) {
             const errorMessage = await convertErrorCodeToMessage(error.code);
             return setErrors({ server: errorMessage });
@@ -83,6 +88,14 @@ export default function SignupForm() {
             const userCredential = await signInWithPopup(auth, provider);
             console.log(userCredential);
             if (!userCredential) throw new Error("User not found");
+            const user = userCredential.user;
+
+            await storeUserInfo(
+                user.uid,
+                user.email,
+                user.displayName,
+                user.photoURL,
+            );
         } catch (error) {
             const errorMessage = await convertErrorCodeToMessage(error.code);
             console.log(errorMessage, error.code);

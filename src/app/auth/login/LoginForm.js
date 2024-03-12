@@ -16,6 +16,7 @@ import {
 import { auth } from "@/firebase/client";
 import { convertErrorCodeToMessage } from "@/lib/firebase";
 import { redirect } from "next/navigation";
+import { storeUserInfo } from "@/utils/users";
 
 export default function LoginForm() {
     const [errors, setErrors] = useState({});
@@ -69,6 +70,14 @@ export default function LoginForm() {
             const userCredential = await signInWithPopup(auth, provider);
             console.log(userCredential);
             if (!userCredential) throw new Error("User not found");
+            const user = userCredential.user;
+
+            await storeUserInfo(
+                user.uid,
+                user.email,
+                user.displayName,
+                user.photoURL,
+            );
         } catch (error) {
             const errorMessage = await convertErrorCodeToMessage(error.code);
             console.log(errorMessage, error.code);

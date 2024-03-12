@@ -21,6 +21,9 @@ export function convertErrorCodeToMessage(errorCode) {
         case "auth/too-many-requests":
             errorMessage = "Too many requests. Try again later.";
             break;
+        case "auth/email-already-exists":
+            errorMessage = "Email already exists.";
+            break;
         default:
             errorMessage = "An error occurred. Please try again later.";
             break;

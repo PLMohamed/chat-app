@@ -4,7 +4,6 @@ export default function ChatLayout({ children }) {
     return (
         <>
             <SideBar />
-
             {children}
         </>
     );

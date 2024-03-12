@@ -3,18 +3,27 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SideBarItem, { LoadingItem } from "./SideBarItem";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { auth } from "@/firebase/client";
+import { auth, db } from "@/firebase/client";
 import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
-import Image from "next/image";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { collection } from "firebase/firestore";
+import { getUserInfo } from "@/utils/users";
 
 export default function SideBar() {
     const [user, loading, error] = useAuthState(auth);
-    const [signOut, loading1, error1] = useSignOut(auth);
-    if (loading) return <Loading />;
+    const [signOut] = useSignOut(auth);
+    const [snapshot] = useCollection(collection(db, "chat"));
+    const chats = snapshot?.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
 
-    if (!user) redirect("/auth/login");
+    const chatExists = (uid) =>
+        chats?.find(
+            (chat) => chat.users.includes(user.uid) && chat.users.includes(uid),
+        );
+
+    if (loading) return <Loading />;
     if (user)
         return (
             <>
@@ -31,31 +40,41 @@ export default function SideBar() {
                     </div>
                     <div className="flex h-full flex-col justify-between  py-4 ">
                         <ul className="space-y-4 px-3 font-medium">
-                            <SideBarItem
-                                img="/accountImagePlaceholder.jpg"
-                                title="User"
-                                text="my last message"
-                            />
-                            <SideBarItem
-                                img="/accountImagePlaceholder.jpg"
-                                title="User"
-                                text="my last message"
-                            />
+                            {chats?.map(async (chat) => {
+                                const friend = chat.users.find(
+                                    (uid) => uid !== user.uid,
+                                );
+                                if (!friend) return null;
+                                const friendInfo = await getUserInfo(friend);
+                                return (
+                                    <SideBarItem
+                                        key={chat.id}
+                                        index={chat.id}
+                                        img={
+                                            friendInfo.avatar ||
+                                            "/accountImagePlaceholder.jpg"
+                                        }
+                                        title={friendInfo.username}
+                                        text="none"
+                                    />
+                                );
+                            })}
                         </ul>
                         <div className="flex space-x-2 border-t px-5 py-3 pt-4 dark:border-gray-400">
                             <img
-                                src={user.photoURL}
+                                src={
+                                    user.photoURL ||
+                                    "/accountImagePlaceholder.jpg"
+                                }
                                 alt={user.displayName}
                                 width={50}
                                 height={50}
                                 className="rounded-full"
                             />
-                            <Link
-                                href="#"
-                                className="flex flex-col overflow-x-hidden"
+                            <div
+                                className="flex cursor-pointer flex-col overflow-x-hidden"
                                 onClick={async () => {
-                                    const result = await signOut();
-                                    if (result) redirect("/auth/login");
+                                    await signOut();
                                 }}
                             >
                                 <span className="text-lg">
@@ -64,7 +83,7 @@ export default function SideBar() {
                                 <span className="text-xs text-gray-500 dark:text-gray-400">
                                     {user.email}
                                 </span>
-                            </Link>
+                            </div>
                         </div>
                     </div>
                 </aside>
